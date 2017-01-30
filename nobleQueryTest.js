@@ -1,4 +1,5 @@
 // NOTE: This test is specific to the CC2650 sensortag.  But the patch in issues/532 hopefully is generic enough..
+// NOTE2: You must pass the UUID of the device you want to connect to on the commandline.. (process.argv[2])
 
 // It will attempt to:
 // * Do a scan
@@ -10,8 +11,6 @@
 // without the patch in https://github.com/sandeepmistry/noble/issues/532 the data stream from IR Temp will stop.
 
 let noble = require("noble");
-
-let UUIDToConnect = '63eb5a93bdc746bb9169c9325390b72e';  // update this with the UUID of the device you want to connect to..
 
 let ourDevice = null;
 let devices = [];
@@ -76,10 +75,17 @@ function configureBluetooth() {
     });
 }
 
+// check that the user passed a uuid or mac for connecting to..then scan and connect.
 function startScanning() {
+    if (process.argv[2] === undefined) {
+        console.log("You must specify a device handle for scanning.\nOn MAC that is a full 128bit UUID\nOn linux a undotted MAC Address\n")
+        return;
+    }
+
+    console.log("looking for device -> " + process.argv[2])
     activeScan(null, () => {
         devices.forEach(d => {
-            if (d.id === UUIDToConnect) {
+            if (d.id === process.argv[2]) {
                 connectToDevice(d).then(() => {
                     ourDevice = d;
                     setTimeout(beginTest, 0); // this fires up the actual tests after connection
@@ -104,8 +110,8 @@ function readData() {
     .then(enableNotify.bind(null, ourDevice, IR_TEMP_READ))
     .then(enableStreamReading.bind(null, ourDevice, IR_TEMP_READ))
     .then(() => {
-        console.log("We should still be streaming..");
-        setTimeout(() => attemptDisrupt(), 2000);
+        console.log("We should be streaming..");
+        setTimeout(() => attemptDisrupt(), 3000);
     });
 }
 
