@@ -1,0 +1,14 @@
+{
+  "name": "nobleQueryTest",
+  "version": "1.0.0",
+  "os": [
+    "darwin",
+    "linux"
+  ],
+  "description": "",
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "noble": "^1.5.0"
+  }
+}
